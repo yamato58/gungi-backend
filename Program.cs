@@ -17,7 +17,7 @@ namespace GungiBackend
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngular",
-                    policy => policy.WithOrigins("http://localhost:4200") // AngularのデフォルトURL
+                    policy => policy.WithOrigins("https://gungi-frontend.onrender.com") // AngularのデフォルトURL
                                     .AllowAnyHeader()
                                     .AllowAnyMethod());
             });
