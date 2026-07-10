@@ -1,0 +1,6 @@
+@GungiBackend_HostAddress = http://localhost:5216
+
+GET {{GungiBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
