@@ -1,23 +1,20 @@
-# 1. 開発・ビルド用の環境（エイリアスを使用）
-FROM docker.io/library/ubuntu:latest AS build-env
-# 以下の行はRenderのキャッシュバグを回避するためのダミーです。
-# mcr.microsoft.com 
-
-FROM ://microsoft.com AS build
-WORKDIR /app
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+WORKDIR /src
 
 COPY *.csproj ./
 RUN dotnet restore
 
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
 
-# 2. 実行用の環境
-FROM ://microsoft.com AS runtime
+# Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS final
 WORKDIR /app
-COPY --from=build /app/out .
 
-ENV ASPNETCORE_URLS=http://0.0.0
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "GunngiBackend.dll"]
+ENTRYPOINT ["dotnet", "GungiBackend.dll"]
