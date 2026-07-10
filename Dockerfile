@@ -17,7 +17,7 @@ COPY --from=build /app/out .
 
 # Renderが指定するポート（10000）で起動するための設定
 ENV ASPNETCORE_URLS=http://+:10000
-EXPOSE 10000
+EXPOSE 8080
 
 # あなたのcsprojのファイル名に合わせてここを書き換えてください
 ENTRYPOINT ["dotnet", "GunngiBackend.dll"]
