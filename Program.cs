@@ -1,4 +1,6 @@
 
+using GungiBackend.Services;
+
 namespace GungiBackend
 {
     public class Program
@@ -13,14 +15,24 @@ namespace GungiBackend
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            // ─── 【追記①】CORSポリシーの定義 ───
+            // CORSポリシーの定義
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngular",
-                    policy => policy.WithOrigins("https://gungi-frontend.onrender.com") // AngularのデフォルトURL
+                    policy => policy.WithOrigins("http://localhost:4200") // AngularのデフォルトURL
                                     .AllowAnyHeader()
                                     .AllowAnyMethod());
             });
+
+            // DIの定義
+            builder.Services.AddSingleton<IGameService, GameService>();
+            builder.Services.AddSingleton<IPiecePositionService, PiecePositionService>();
+            builder.Services.AddSingleton<ISelectPieceService, SelectPieceService>();
+            builder.Services.AddSingleton<IReplayService, ReplayService>();
+            builder.Services.AddSingleton<ITurnService, TurnService>();
+            builder.Services.AddSingleton<IMovePieceService, MovePieceService>();
+            builder.Services.AddSingleton<IGameJudgeService, GameJudgeService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
