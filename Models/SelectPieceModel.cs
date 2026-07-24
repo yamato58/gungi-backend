@@ -2,10 +2,10 @@
 {
     public class SelectPieceModel
     {
-        public string pieceName { get; set; } = string.Empty;
-        public int currentX { get; set; }
-        public int currentY { get; set; }
-        public int currentZ { get; set; } // 高さ
-        public bool player { get; set; }
+        public string PieceName { get; set; } = string.Empty;
+        public int CurrentX { get; set; }
+        public int CurrentY { get; set; }
+        public int CurrentZ { get; set; } // 高さ
+        public bool Player { get; set; }
     }
 }

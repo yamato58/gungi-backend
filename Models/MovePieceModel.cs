@@ -2,11 +2,11 @@
 {
     public class MovePieceModel
     {
-        public int id { get; set; }
-        public int nextX { get; set; }
-        public int nextY { get; set; }
-        public int nextZ { get; set; }
-        public bool isPlayer { get; set; }
-        public bool isGet { get; set; }
+        public int Id { get; set; }
+        public int NextX { get; set; }
+        public int NextY { get; set; }
+        public int NextZ { get; set; }
+        public bool IsPlayer { get; set; }
+        public bool IsGet { get; set; }
     }
 }

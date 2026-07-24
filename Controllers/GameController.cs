@@ -10,71 +10,57 @@ namespace GungiBackend.Controllers
     [Route("[controller]")]
     public class GameController : ControllerBase
     {
-        private static GameService gameService = new GameService();
-        private static SelectPieceService selectPieceService = new SelectPieceService();
+        private readonly IGameService _gameService;
+
+        public GameController(IGameService gameService)
+        {
+            _gameService = gameService;
+        }
 
         // 初期データ
         [HttpGet("initial-data", Name = "GetGame")]
-        public ActionResult<MoveResultModel> Get()
+        public ActionResult<MoveResultModel> InitialGet()
         {
-            MoveResultModel result = new MoveResultModel
-            {
-                Pieces = gameService.allPieces,
-                GameResult = 0
-            };
-
-            return Ok(result);
+            return Ok(_gameService.InitialPosition());
         }
 
         // クリックしたデータ
         [HttpPost("select-data", Name = "PostSelectGame")]
-        public ActionResult<SelectPieceModel> Post([FromBody] SelectPieceModel selectedPiece)
+        public ActionResult<SelectPieceModel> ClickData([FromBody] SelectPieceModel selectedPiece)
         {
-            SelectPieceService selectPieceService = new SelectPieceService();
-            selectPieceService.AddPieceLocation(gameService.allPieces, selectedPiece);
-
-            return Ok(selectPieceService.MoveableLocation);
+            return Ok(_gameService.GetMoveableLocation(selectedPiece));
         }
 
         // 移動後のデータ
         [HttpPost("next-data", Name = "PostNextGame")]
-        public ActionResult<MoveResultModel> Post([FromBody] MovePieceModel movePiece)
+        public ActionResult<MoveResultModel> MovedData([FromBody] MovePieceModel movePiece)
         {
-            MovePieceService movePieceService = new MovePieceService();
-            GameJudgeService gameJudgeService = new GameJudgeService();
-
-            movePieceService.UpdatePosition(gameService.allPieces, movePiece);
-
-            MoveResultModel result = new MoveResultModel
-            {
-                Pieces = gameService.allPieces,
-                GameResult = gameJudgeService.CalGameJudege(gameService.allPieces)
-            };
-
-            return Ok(result);
+            return Ok(_gameService.MovePiece(movePiece));
         }
 
         // リセットデータ
         [HttpPost("boardreset-data", Name = "PostReset")]
-        public ActionResult<MoveResultModel> Post()
+        public ActionResult<MoveResultModel> BoardReset()
         {
-            gameService = new GameService();
+            _gameService.PositionReset();
+            _gameService.AllPiecesListReset();
+            _gameService.TurnReset();
 
-            MoveResultModel result = new MoveResultModel
-            {
-                Pieces = gameService.allPieces,
-                GameResult = 0
-            };
-
-            return Ok(result);
+            return Ok(_gameService.InitialPosition());
         }
 
         [HttpPost("cellreset-data", Name = "PostResets")]
-        public ActionResult<List<MoveableRangeModel>> Post2()
+        public ActionResult<List<MoveableRangeModel>> CellReset()
         {
-            selectPieceService = new SelectPieceService();
+            _gameService.CellReset();
+            return Ok();
+        }
 
-            return Ok(selectPieceService.MoveableLocation);
+        // リプレイデータ
+        [HttpPost("replay-data", Name = "PostReplay")]
+        public ActionResult<MoveResultModel> Replay([FromBody] int replayNum)
+        {
+            return Ok(_gameService.ReplayData(replayNum));
         }
     }
 }

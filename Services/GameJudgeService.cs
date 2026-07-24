@@ -2,18 +2,17 @@
 
 namespace GungiBackend.Services
 {
-    public class GameJudgeService
+    public class GameJudgeService : IGameJudgeService
     {
-        public List<List<Piece>> allPiecesList { get; set; } = new List<List<Piece>>();
-
-        public int CalGameJudege(List<Piece> allPieces)
+        // 勝敗判定の計算
+        public int CalGameJudege(List<Piece> allPieces, List<List<Piece>> allPiecesList)
         {
             // データ分ループ
             foreach (Piece piece in allPieces)
             {
-                if (piece.pieceName == "帥" && piece.currentX == 10)
+                if (piece.PieceName == "帥" && piece.CurrentX == 10)
                 {
-                    if (piece.player)
+                    if (piece.Player)
                     {
                         return 2;
                     }
@@ -22,23 +21,46 @@ namespace GungiBackend.Services
                         return 1;
                     }
                 }
-                else if (DrawJudge(allPieces))
-                {
-                    return 3;
-                }
+            }
+            if (DrawJudge(allPiecesList))
+            {
+                return 3;
             }
             return 0;
         }
 
-        public bool DrawJudge(List<Piece> allPieces)
+        // 引き分けの計算
+        public bool DrawJudge(List<List<Piece>> allPiecesList)
         {
-            for (int i = 0; i < allPieces.Count; i++)
+            List<Piece> currentBoard = allPiecesList[allPiecesList.Count - 1];
+
+            int judgeCount = 0;
+
+            for (int i = 0; i < allPiecesList.Count; i++)
             {
-                allPiecesList.Add(allPieces);
-                //Console.WriteLine(allPiecesList);
+                if (IsCompareBoard(currentBoard, allPiecesList[i]))
+                {
+                    judgeCount++;
+                }
             }
-            //Console.WriteLine(allPiecesList[0][0]);
-            return false;
+
+            return judgeCount >= 4;
+        }
+
+        // 現在の盤と過去の盤が同じかどうかの比較
+        public bool IsCompareBoard(List<Piece> currentBoard, List<Piece> PastBoard)
+        {
+            for (int i = 0; i < currentBoard.Count; i++)
+            {
+                if (currentBoard[i].Id != PastBoard[i].Id
+                    || currentBoard[i].CurrentX != PastBoard[i].CurrentX
+                    || currentBoard[i].CurrentY != PastBoard[i].CurrentY
+                    || currentBoard[i].CurrentZ != PastBoard[i].CurrentZ)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

@@ -1,67 +1,132 @@
 ﻿using GungiBackend.models;
+using GungiBackend.Models;
 
 namespace GungiBackend.Services
 {
-    public class GameService
+    public class GameService : IGameService
     {
-        // 駒の情報を入れるリスト
-        public List<Piece> allPieces { get; set; } = new List<Piece>();
+        private readonly IPiecePositionService _piecePositionService;
+        private readonly ISelectPieceService _selectPieceService;
+        private readonly IReplayService _replayService;
+        private readonly ITurnService _turnService;
+        private readonly IMovePieceService _movePieceService;
+        private readonly IGameJudgeService _gameJudgeService;
 
-        public GameService()
+        public List<Piece> PiecePlacement { get; set; }
+
+        private List<Piece> CopyPiecePlacement { get; set; }
+
+        // コンストラクタ
+        public GameService(IPiecePositionService piecePositionService, ISelectPieceService selectPieceService, IReplayService replayService, ITurnService turnService, IMovePieceService movePieceService, IGameJudgeService gameJudgeService)
         {
-            initialPosition();
+            _piecePositionService = piecePositionService;
+            _selectPieceService = selectPieceService;
+            _replayService = replayService;
+            _turnService = turnService;
+            _movePieceService = movePieceService;
+            _gameJudgeService = gameJudgeService;
+            PiecePlacement = _piecePositionService.CreateInitialPosition();
+            CopyPiecePlacement = PiecePlacement;
         }
 
-        // 駒の初期配置をListに追加
-        public void initialPosition()
+        // 初期の駒データ
+        public MoveResultModel InitialPosition()
         {
-            // 先手
-            allPieces.Add(new Piece(1, "帥", 4, 8, 1, true));
-            allPieces.Add(new Piece(2, "大", 3, 8, 1, true));
-            allPieces.Add(new Piece(3, "中", 5, 8, 1, true));
-            allPieces.Add(new Piece(4, "小", -1, -1, 1, true));
-            allPieces.Add(new Piece(5, "小", -1, -1, 1, true));
-            allPieces.Add(new Piece(6, "侍", 3, 6, 1, true));
-            allPieces.Add(new Piece(7, "侍", 5, 6, 1, true));
-            allPieces.Add(new Piece(8, "槍", 4, 7, 1, true));
-            allPieces.Add(new Piece(9, "槍", -1, -1, 1, true));
-            allPieces.Add(new Piece(10, "槍", -1, -1, 1, true));
-            allPieces.Add(new Piece(11, "馬", 7, 7, 1, true));
-            allPieces.Add(new Piece(12, "馬", -1, -1, 1, true));
-            allPieces.Add(new Piece(13, "忍", 1, 7, 1, true));
-            allPieces.Add(new Piece(14, "忍", -1, -1, 1, true));
-            allPieces.Add(new Piece(15, "砦", 2, 6, 1, true));
-            allPieces.Add(new Piece(16, "砦", 6, 6, 1, true));
-            allPieces.Add(new Piece(17, "兵", 0, 6, 1, true));
-            allPieces.Add(new Piece(18, "兵", 4, 6, 1, true));
-            allPieces.Add(new Piece(19, "兵", 8, 6, 1, true));
-            allPieces.Add(new Piece(20, "兵", -1, -1, 1, true));
-            allPieces.Add(new Piece(21, "弓", 2, 7, 1, true));
-            allPieces.Add(new Piece(22, "弓", 6, 7, 1, true));
+            // 最初の場合のみ呼び出される
+            if (_replayService.CountAllPieces() == 0)
+            {
+                _replayService.ListCreate(PiecePlacement);
 
-            // 後手
-            allPieces.Add(new Piece(23, "帥", 4, 0, 1, false));
-            allPieces.Add(new Piece(24, "大", 5, 0, 1, false));
-            allPieces.Add(new Piece(25, "中", 3, 0, 1, false));
-            allPieces.Add(new Piece(26, "小", -1, -1, 1, false));
-            allPieces.Add(new Piece(27, "小", -1, -1, 1, false));
-            allPieces.Add(new Piece(28, "侍", 3, 2, 1, false));
-            allPieces.Add(new Piece(29, "侍", 5, 2, 1, false));
-            allPieces.Add(new Piece(30, "槍", 4, 1, 1, false));
-            allPieces.Add(new Piece(31, "槍", -1, -1, 1, false));
-            allPieces.Add(new Piece(32, "槍", -1, -1, 1, false));
-            allPieces.Add(new Piece(33, "馬", 1, 1, 1, false));
-            allPieces.Add(new Piece(34, "馬", -1, -1, 1, false));
-            allPieces.Add(new Piece(35, "忍", 7, 1, 1, false));
-            allPieces.Add(new Piece(36, "忍", -1, -1, 1, false));
-            allPieces.Add(new Piece(37, "砦", 2, 2, 1, false));
-            allPieces.Add(new Piece(38, "砦", 6, 2, 1, false));
-            allPieces.Add(new Piece(39, "兵", 0, 2, 1, false));
-            allPieces.Add(new Piece(40, "兵", 4, 2, 1, false));
-            allPieces.Add(new Piece(41, "兵", 8, 2, 1, false));
-            allPieces.Add(new Piece(42, "兵", -1, -1, 1, false));
-            allPieces.Add(new Piece(43, "弓", 2, 1, 1, false));
-            allPieces.Add(new Piece(44, "弓", 6, 1, 1, false));
+                return new MoveResultModel
+                {
+                    Pieces = PiecePlacement,
+                    turn = _turnService.CurrentTurn(),
+                    MoveCount = _replayService.MoveMaxCountConfirm(),
+                    MaxMoveCount = _replayService.MoveMaxCountConfirm(),
+                    GameResult = _gameJudgeService.CalGameJudege(PiecePlacement, _replayService.GetList()),
+                };
+            }
+
+            // リロード時に呼び出される
+            return new MoveResultModel
+            {
+                //Pieces = PiecePlacement,
+                Pieces = this.CopyPiecePlacement,
+                turn = _turnService.CurrentTurn(),
+                MoveCount = _replayService.ReroadMoveCountConfirm(),
+                MaxMoveCount = _replayService.MoveMaxCountConfirm(),
+                GameResult = _gameJudgeService.CalGameJudege(PiecePlacement, _replayService.GetList()),
+            };
+        }
+
+        // 駒のリセット
+        public void PositionReset()
+        {
+            PiecePlacement = _piecePositionService.CreateInitialPosition();
+        }
+
+        // 選択された駒の動ける範囲
+        public List<MoveableRangeModel> GetMoveableLocation(SelectPieceModel selectedPiece)
+        {
+            return _selectPieceService.GetMoveableLocation(PiecePlacement, selectedPiece);
+        }
+
+        // 範囲のリセット
+        public void CellReset()
+        {
+            _selectPieceService.ResetMoveableLocation();
+        }
+
+        // 駒情報を保存するためのListをリセット
+        public void AllPiecesListReset()
+        {
+            _replayService.ResetAllPiecesList();
+        }
+
+        // ターン情報をリセット
+        public void TurnReset()
+        {
+            _turnService.ResetTurn();
+        }
+
+        // 駒の移動
+        public MoveResultModel MovePiece(MovePieceModel movePiece)
+        {
+            _movePieceService.UpdatePosition(PiecePlacement, movePiece);
+
+            int result = _gameJudgeService.CalGameJudege(PiecePlacement, _replayService.GetList());
+
+            _replayService.ListCreate(PiecePlacement);
+
+            // 結果が勝利または引き分けのときに実行
+            if (result != 0)
+            {
+                _replayService.StartReplay();
+            }
+
+            return new MoveResultModel
+            {
+                Pieces = PiecePlacement,
+                turn = _turnService.CalTurn(),
+                MoveCount = _replayService.MoveMaxCountConfirm(),
+                MaxMoveCount = _replayService.MoveMaxCountConfirm(),
+                GameResult = result,
+            };
+        }
+
+        // リプレイデータの呼び出し
+        public MoveResultModel ReplayData(int replayNum)
+        {
+            this.CopyPiecePlacement = _replayService.ReplayData(replayNum);
+
+            return new MoveResultModel
+            {
+                Pieces = this.CopyPiecePlacement,
+                turn = _turnService.CalTurn(),
+                MoveCount = _replayService.ReplayMoveCountConfirm(replayNum),
+                MaxMoveCount = _replayService.MoveMaxCountConfirm(),
+                GameResult = 0
+            };
         }
     }
 }

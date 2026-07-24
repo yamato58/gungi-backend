@@ -3,10 +3,9 @@ using GungiBackend.Models;
 
 namespace GungiBackend.Services
 {
-    public class MovePieceService
+    public class MovePieceService : IMovePieceService
     {
-        //private static GameService gameService = new GameService();
-
+        // 駒の移動後の計算
         public void UpdatePosition(List<Piece> allPieces, MovePieceModel movePiece)
         {
             int flag = 0;
@@ -16,20 +15,20 @@ namespace GungiBackend.Services
             {
                 Piece piece = allPieces[i];
 
-                if (movePiece.id != piece.id && piece.currentX == movePiece.nextX && piece.currentY == movePiece.nextY)
+                if (movePiece.Id != piece.Id && piece.CurrentX == movePiece.NextX && piece.CurrentY == movePiece.NextY)
                 {
-                    if (movePiece.isPlayer == piece.player)
+                    if (movePiece.IsPlayer == piece.Player)
                     {
                         tsuekeCnt++;
                         flag = 1;
                     }
-                    else if (movePiece.isPlayer != piece.player)
+                    else if (movePiece.IsPlayer != piece.Player)
                     {
-                        if (movePiece.isGet)
+                        if (movePiece.IsGet)
                         {
-                            piece.currentX = 10;
-                            piece.currentY = 10;
-                            piece.currentZ = 1;
+                            piece.CurrentX = 10;
+                            piece.CurrentY = 10;
+                            piece.CurrentZ = 1;
                             flag = 2;
                         }
                         else
@@ -44,41 +43,40 @@ namespace GungiBackend.Services
             {
                 Piece piece = allPieces[i];
                 // 取得の場合
-                if (movePiece.id == piece.id && flag == 2)
+                if (movePiece.Id == piece.Id && flag == 2)
                 {
                     Cal(piece, movePiece);
                     if (tsuekeCnt == 0)
                     {
-                        piece.currentZ = 1;
+                        piece.CurrentZ = 1;
                         break;
                     }
-                    piece.currentZ = tsuekeCnt + 1;
+                    piece.CurrentZ = tsuekeCnt + 1;
                     break;
                 }
                 // ツケの場合
-                if (movePiece.id == piece.id && flag == 1)
+                if (movePiece.Id == piece.Id && flag == 1)
                 {
-                    //piece.x = movePiece.nextX;
-                    //piece.y = movePiece.nextY;
                     Cal(piece, movePiece);
-                    piece.currentZ = 0;
-                    piece.currentZ = tsuekeCnt + 1;
+                    piece.CurrentZ = 0;
+                    piece.CurrentZ = tsuekeCnt + 1;
                     break;
                 }
                 // 普通の移動の場合
-                else if (movePiece.id == piece.id && flag == 0)
+                else if (movePiece.Id == piece.Id && flag == 0)
                 {
                     Cal(piece, movePiece);
-                    piece.currentZ = 1;
+                    piece.CurrentZ = 1;
                     break;
                 }
             }
-            tsuekeCnt = 0;
         }
-        public void Cal(Piece piece, MovePieceModel movePiece)
+
+        // 現在の駒の座標を次の座標に変更
+        private static void Cal(Piece piece, MovePieceModel movePiece)
         {
-            piece.currentX = movePiece.nextX;
-            piece.currentY = movePiece.nextY;
+            piece.CurrentX = movePiece.NextX;
+            piece.CurrentY = movePiece.NextY;
         }
     }
 }

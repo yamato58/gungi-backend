@@ -3,16 +3,18 @@ using GungiBackend.Models;
 
 namespace GungiBackend.Services
 {
-    public class SelectPieceService
+    public class SelectPieceService : ISelectPieceService
     {
         public List<MoveableRangeModel> MoveableLocation { get; set; } = new List<MoveableRangeModel>();
 
-        // 移動できる範囲の追加
-        public void AddPieceLocation(List<Piece> allPieces, SelectPieceModel selectedPiece)
+        // 駒が動ける範囲の計算
+        public List<MoveableRangeModel> GetMoveableLocation(List<Piece> allPieces, SelectPieceModel selectedPiece)
         {
-            if (selectedPiece.currentX == -1 && selectedPiece.currentY == -1)
+            MoveableLocation.Clear();
+
+            if (selectedPiece.CurrentX == -1 && selectedPiece.CurrentY == -1)
             {
-                if (selectedPiece.player)
+                if (selectedPiece.Player)
                 {
                     BlackHandPieceRange(allPieces, selectedPiece);
                 }
@@ -20,11 +22,11 @@ namespace GungiBackend.Services
                 {
                     WhiteHandPieceRange(allPieces, selectedPiece);
                 }
-                return;
+                return MoveableLocation;
             }
 
             // 帥の範囲
-            if (selectedPiece.pieceName == "帥")
+            if (selectedPiece.PieceName == "帥")
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -38,7 +40,7 @@ namespace GungiBackend.Services
             }
 
             // 大の範囲
-            if (selectedPiece.pieceName == "大")
+            if (selectedPiece.PieceName == "大")
             {
                 var directions1 = new (int dx, int dy)[]
                 {
@@ -59,7 +61,7 @@ namespace GungiBackend.Services
             }
 
             // 中の範囲
-            if (selectedPiece.pieceName == "中")
+            if (selectedPiece.PieceName == "中")
             {
                 var directions1 = new (int dx, int dy)[]
                 {
@@ -79,7 +81,7 @@ namespace GungiBackend.Services
             }
 
             // 小の範囲
-            if (selectedPiece.pieceName == "小" && selectedPiece.player)
+            if (selectedPiece.PieceName == "小" && selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -89,7 +91,7 @@ namespace GungiBackend.Services
                 // ツケ
                 TsukeRange(allPieces, directions, selectedPiece, 1);
             }
-            else if (selectedPiece.pieceName == "小" && !selectedPiece.player)
+            else if (selectedPiece.PieceName == "小" && !selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -101,7 +103,7 @@ namespace GungiBackend.Services
             }
 
             // 侍の範囲
-            if (selectedPiece.pieceName == "侍" && selectedPiece.player)
+            if (selectedPiece.PieceName == "侍" && selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -111,7 +113,7 @@ namespace GungiBackend.Services
                 // ツケ
                 TsukeRange(allPieces, directions, selectedPiece, 1);
             }
-            else if (selectedPiece.pieceName == "侍" && !selectedPiece.player)
+            else if (selectedPiece.PieceName == "侍" && !selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -123,7 +125,7 @@ namespace GungiBackend.Services
             }
 
             // 槍の範囲
-            if (selectedPiece.pieceName == "槍" && selectedPiece.player)
+            if (selectedPiece.PieceName == "槍" && selectedPiece.Player)
             {
                 var directions1 = new (int dx, int dy)[] { (0, -1) }; // 上
 
@@ -138,7 +140,7 @@ namespace GungiBackend.Services
                 // ツケ
                 TsukeRange(allPieces, directions2, selectedPiece, 1);
             }
-            else if (selectedPiece.pieceName == "槍" && !selectedPiece.player)
+            else if (selectedPiece.PieceName == "槍" && !selectedPiece.Player)
             {
                 var directions1 = new (int dx, int dy)[] { (0, 1) }; // 上
 
@@ -155,7 +157,7 @@ namespace GungiBackend.Services
             }
 
             // 馬の範囲
-            if (selectedPiece.pieceName == "馬")
+            if (selectedPiece.PieceName == "馬")
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -167,7 +169,7 @@ namespace GungiBackend.Services
             }
 
             // 忍の範囲
-            if (selectedPiece.pieceName == "忍")
+            if (selectedPiece.PieceName == "忍")
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -179,7 +181,7 @@ namespace GungiBackend.Services
             }
 
             // 砦の範囲
-            if (selectedPiece.pieceName == "砦" && selectedPiece.player)
+            if (selectedPiece.PieceName == "砦" && selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -189,7 +191,7 @@ namespace GungiBackend.Services
                 // ツケ
                 TsukeRange(allPieces, directions, selectedPiece, 1);
             }
-            else if (selectedPiece.pieceName == "砦" && !selectedPiece.player)
+            else if (selectedPiece.PieceName == "砦" && !selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -201,7 +203,7 @@ namespace GungiBackend.Services
             }
 
             // 兵の範囲
-            if (selectedPiece.pieceName == "兵")
+            if (selectedPiece.PieceName == "兵")
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -213,7 +215,7 @@ namespace GungiBackend.Services
             }
 
             // 弓の範囲
-            if (selectedPiece.pieceName == "弓" && selectedPiece.player)
+            if (selectedPiece.PieceName == "弓" && selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -223,7 +225,7 @@ namespace GungiBackend.Services
                 MoveableRange(allPieces, directions, selectedPiece, 1);
 
                 // 2段
-                if (selectedPiece.currentZ == 2)
+                if (selectedPiece.CurrentZ == 2)
                 {
                     var directions2 = new (int dx, int dy)[]
                     {
@@ -232,7 +234,7 @@ namespace GungiBackend.Services
                     MoveableRange(allPieces, directions2, selectedPiece, 1);
                 }
             }
-            else if (selectedPiece.pieceName == "弓" && !selectedPiece.player)
+            else if (selectedPiece.PieceName == "弓" && !selectedPiece.Player)
             {
                 var directions = new (int dx, int dy)[]
                 {
@@ -242,7 +244,7 @@ namespace GungiBackend.Services
                 MoveableRange(allPieces, directions, selectedPiece, 1);
 
                 // 2段
-                if (selectedPiece.currentZ == 2)
+                if (selectedPiece.CurrentZ == 2)
                 {
                     var directions2 = new (int dx, int dy)[]
                     {
@@ -251,6 +253,14 @@ namespace GungiBackend.Services
                     MoveableRange(allPieces, directions2, selectedPiece, 1);
                 }
             }
+
+            return MoveableLocation;
+        }
+
+        // 移動できる範囲のリセット
+        public void ResetMoveableLocation()
+        {
+            MoveableLocation.Clear();
         }
 
         // 駒がどこまで移動できるかどうか(1, 2, 3, 無限に応じて)
@@ -260,8 +270,8 @@ namespace GungiBackend.Services
             foreach (var (dx, dy) in directions)
             {
                 // 次のx, y
-                int nextX = selectedPiece.currentX + dx;
-                int nextY = selectedPiece.currentY + dy;
+                int nextX = selectedPiece.CurrentX + dx;
+                int nextY = selectedPiece.CurrentY + dy;
 
                 int cnt = 0;
 
@@ -285,9 +295,9 @@ namespace GungiBackend.Services
                                 break;
                             }
 
-                            if (nextX == piece.currentX && nextY == piece.currentY)
+                            if (nextX == piece.CurrentX && nextY == piece.CurrentY)
                             {
-                                if (foundPiece == null || piece.currentZ > foundPiece.currentZ)
+                                if (foundPiece == null || piece.CurrentZ > foundPiece.CurrentZ)
                                 {
                                     foundPiece = piece;
                                 }
@@ -311,15 +321,15 @@ namespace GungiBackend.Services
                             MoveableLocation.Add(new MoveableRangeModel(new int[] { nextX, nextY }));
                         }
                         // 帥ツケなし
-                        else if (selectedPiece.pieceName == "帥" && selectedPiece.player == foundPiece.player)
+                        else if (selectedPiece.PieceName == "帥" && selectedPiece.Player == foundPiece.Player)
                         {
                             break;
                         }
-                        else if (foundPiece.player == selectedPiece.player && (foundPiece.pieceName == "帥" || foundPiece.currentZ == 2))
+                        else if (foundPiece.Player == selectedPiece.Player && (foundPiece.PieceName == "帥" || foundPiece.CurrentZ == 2))
                         {
                             break;
                         }
-                        else if (foundPiece.player != selectedPiece.player && selectedPiece.currentZ < foundPiece.currentZ)
+                        else if (foundPiece.Player != selectedPiece.Player && selectedPiece.CurrentZ < foundPiece.CurrentZ)
                         {
                             break;
                         }
@@ -342,24 +352,24 @@ namespace GungiBackend.Services
         private int YumiMoveableRange(List<Piece> allPieces, SelectPieceModel selectedPiece, Piece piece, int nextX, int nextY)
         {
             // 2上
-            if (selectedPiece.pieceName == "弓" && nextY < selectedPiece.currentY)
+            if (selectedPiece.PieceName == "弓" && nextY < selectedPiece.CurrentY)
             {
-                if (selectedPiece.player && nextX == piece.currentX &&
-                    nextY + 1 == piece.currentY && piece.currentZ == 2)
+                if (selectedPiece.Player && nextX == piece.CurrentX &&
+                    nextY + 1 == piece.CurrentY && piece.CurrentZ == 2)
                 {
-                    if (selectedPiece.currentX == piece.currentX && selectedPiece.currentY == piece.currentY + 1)
+                    if (selectedPiece.CurrentX == piece.CurrentX && selectedPiece.CurrentY == piece.CurrentY + 1)
                     {
                         return 2;
                     }
                     return 1;
                 }
             }
-            else if (selectedPiece.pieceName == "弓" && nextY > selectedPiece.currentY)
+            else if (selectedPiece.PieceName == "弓" && nextY > selectedPiece.CurrentY)
             {
-                if (!selectedPiece.player && nextX == piece.currentX &&
-                    nextY - 1 == piece.currentY && piece.currentZ == 2)
+                if (!selectedPiece.Player && nextX == piece.CurrentX &&
+                    nextY - 1 == piece.CurrentY && piece.CurrentZ == 2)
                 {
-                    if (selectedPiece.currentX == piece.currentX && selectedPiece.currentY == piece.currentY - 1)
+                    if (selectedPiece.CurrentX == piece.CurrentX && selectedPiece.CurrentY == piece.CurrentY - 1)
                     {
                         return 2;
                     }
@@ -372,11 +382,11 @@ namespace GungiBackend.Services
         public void TsukeRange(List<Piece> allPieces, (int dx, int dy)[] directions, SelectPieceModel selectedPiece, int moveRange)
         {
             // ツケ
-            if (selectedPiece.currentZ == 1)
+            if (selectedPiece.CurrentZ == 1)
             {
                 MoveableRange(allPieces, directions, selectedPiece, moveRange);
             }
-            else if (selectedPiece.currentZ == 2)
+            else if (selectedPiece.CurrentZ == 2)
             {
                 MoveableRange(allPieces, directions, selectedPiece, moveRange + 1);
             }
@@ -392,27 +402,27 @@ namespace GungiBackend.Services
             // データ分ループ
             for (int i = 0; i < allPieces.Count; i++)
             {
-                if (allPieces[i].currentY != -1 && allPieces[i].currentY != 10)
+                if (allPieces[i].CurrentY != -1 && allPieces[i].CurrentY != 10)
                 {
-                    if (selectedPiece.player)
+                    if (selectedPiece.Player)
                     {
-                        if (allPieces[i].player)
+                        if (allPieces[i].Player)
                         {
-                            piece = allPieces[i].currentY;
+                            piece = allPieces[i].CurrentY;
                             min = Math.Min(min, piece);
                         }
                     }
                     else
                     {
-                        if (!allPieces[i].player)
+                        if (!allPieces[i].Player)
                         {
-                            piece = allPieces[i].currentY;
+                            piece = allPieces[i].CurrentY;
                             max = Math.Max(max, piece);
                         }
                     }
                 }
             }
-            if (selectedPiece.player)
+            if (selectedPiece.Player)
             {
                 return min;
             }
@@ -445,9 +455,9 @@ namespace GungiBackend.Services
                 // データ分ループ
                 foreach (Piece piece in allPieces)
                 {
-                    if (piece.currentX == x && piece.currentY == y)
+                    if (piece.CurrentX == x && piece.CurrentY == y)
                     {
-                        if (topPiece == null || piece.currentZ > topPiece.currentZ)
+                        if (topPiece == null || piece.CurrentZ > topPiece.CurrentZ)
                         {
                             topPiece = piece;
                         }
@@ -458,9 +468,9 @@ namespace GungiBackend.Services
                 {
                     MoveableLocation.Add(new MoveableRangeModel(new int[] { x, y }));
                 }
-                else if (topPiece.player == selectedPiece.player && topPiece.currentZ < 2 && topPiece.pieceName != "帥")
+                else if (topPiece.Player == selectedPiece.Player && topPiece.CurrentZ < 2 && topPiece.PieceName != "帥")
                 {
-                    MoveableLocation.Add(new MoveableRangeModel(new int[] { topPiece.currentX, topPiece.currentY }));
+                    MoveableLocation.Add(new MoveableRangeModel(new int[] { topPiece.CurrentX, topPiece.CurrentY }));
                 }
             }
         }
